@@ -1,11 +1,11 @@
 discord-bot-demo/
+├─ index.html      
 ├─ bot.js
 ├─ commands/
-│  ├─ profile.js
-│  └─ show.js
+│   ├─ profile.js
+│   └─ show.js
 ├─ profiles.json
 ├─ package.json
-├─ index.html
 └─ README.md
 
   {
