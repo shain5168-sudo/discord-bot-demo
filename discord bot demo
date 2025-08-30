@@ -1,5 +1,5 @@
 discord-bot-demo/
-├─ Index.html      
+├─ index.html      
 ├─ bot.js
 ├─ commands/
 ├─ profiles.json
