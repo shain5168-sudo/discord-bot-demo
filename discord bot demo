@@ -1,0 +1,110 @@
+discord-bot-demo/
+├─ bot.js
+├─ commands/
+│  ├─ profile.js
+│  └─ show.js
+├─ profiles.json
+├─ package.json
+├─ index.html
+└─ README.md
+
+  {
+  "name": "discord-bot-demo",
+  "version": "1.0.0",
+  "description": "Demo Discord bot with landing page",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.13.0"
+  }
+}
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const fs = require('fs');
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+
+client.commands = new Collection();
+client.commands.set('profile', require('./commands/profile'));
+client.commands.set('show', require('./commands/show'));
+
+const dbFile = './profiles.json';
+let profiles = {};
+if (fs.existsSync(dbFile)) {
+  profiles = JSON.parse(fs.readFileSync(dbFile));
+}
+
+client.once('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`);
+});
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+  const command = client.commands.get(interaction.commandName);
+  if (command) command.execute(interaction, profiles, dbFile);
+});
+
+client.login(process.env.BOT_TOKEN);
+
+const fs = require('fs');
+
+module.exports = {
+  name: 'profile',
+  description: 'Save your nickname',
+  async execute(interaction, profiles, dbFile) {
+    const nickname = interaction.options.getString('nickname');
+    profiles[interaction.user.id] = nickname;
+    fs.writeFileSync(dbFile, JSON.stringify(profiles, null, 2));
+    await interaction.reply(`Profile saved: ${nickname}`);
+  },
+};
+
+module.exports = {
+  name: 'show',
+  description: 'Show your saved nickname',
+  async execute(interaction, profiles) {
+    const name = profiles[interaction.user.id] || 'Not set';
+    await interaction.reply(`Your nickname: ${name}`);
+  },
+};
+
+{}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discord Bot Demo</title>
+<style>
+body { font-family: Arial; background: #f5f5f5; text-align:center; padding:50px;}
+button { padding:10px 20px; font-size:16px; margin-top:20px; }
+</style>
+</head>
+<body>
+<h1>Welcome to My Discord Bot!</h1>
+<p>Demo bot with basic commands (/profile, /show) and a simple landing page.</p>
+<button onclick="window.location.href='https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=8'">
+Connect with Discord
+</button>
+</body>
+</html>
+
+  # Discord Bot Demo
+
+## Features
+- /profile — Save a nickname
+- /show — Show your nickname
+- Simple landing page describing the bot
+
+## Setup
+1. Install Node.js (v18+)
+2. Clone the repo
+3. Run `npm install`
+4. Add your bot token in Replit Secrets or `.env` as `BOT_TOKEN`
+5. Run `node bot.js` to start
+6. Invite the bot to your server with OAuth2 URL
+
+## Hosting
+- Free: Replit (bot), GitHub Pages / Netlify (landing page)
+- Paid: VPS or cloud hosting for 24/7 uptime
